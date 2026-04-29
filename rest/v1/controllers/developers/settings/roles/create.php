@@ -1,0 +1,20 @@
+<?php
+
+$conn = null;
+$conn = checkDbConnection();
+$val = new Roles($conn);
+
+$val->role_is_active = 1;
+$val->role_name = trim($data['role_name']);
+$val->role_description = trim($data['role_description']);
+$val->role_created = date('Y-m-d H:i:s');
+$val->role_updated = date('Y-m-d H:i:s');
+
+checkPayload($data);
+checkIndex($data, 'role_name');
+checkIndex($data, 'role_description');
+isNameExist($val, $val->role_name);
+
+$query = checkCreate($val);
+http_response_code(200);
+returnSuccess($val, "Role Create", $query);
