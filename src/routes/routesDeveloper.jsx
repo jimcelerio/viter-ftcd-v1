@@ -5,6 +5,9 @@ import PlaceholderPage from "../pages/developer/PlaceholderPage";
 import Roles from "../pages/developer/settings/users/roles/Roles";
 import SystemUsers from "../pages/developer/settings/users/system-users/SystemUsers";
 import Category from "../pages/developer/settings/category/Category";
+import Designation from "../pages/developer/settings/designation/Designation";
+import Notification from "../pages/developer/settings/notification/Notification";
+import Children from "../pages/developer/childrenlist/Children";
 
 export const routesDeveloper = [
   {
@@ -51,7 +54,7 @@ export const routesDeveloper = [
     path: `${devNavUrl}/${urlDeveloper}/children-list`,
     element: (
       <>
-        <PlaceholderPage menu="children-list" />
+        <Children />
       </>
     ),
   },
@@ -91,7 +94,7 @@ export const routesDeveloper = [
     path: `${devNavUrl}/${urlDeveloper}/settings/designation`,
     element: (
       <>
-        <PlaceholderPage menu="settings" submenu="designation" />
+        <Designation />
       </>
     ),
   },
@@ -99,7 +102,7 @@ export const routesDeveloper = [
     path: `${devNavUrl}/${urlDeveloper}/settings/notification`,
     element: (
       <>
-        <PlaceholderPage menu="settings" submenu="notification" />
+        <Notification />
       </>
     ),
   },

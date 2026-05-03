@@ -1,29 +1,28 @@
 import React from "react";
-import { StoreContext } from "../../../store/StoreContext";
+import { StoreContext } from "../../../../store/StoreContext";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { queryDataInfinite } from "../../../functions/custom-hooks/queryDataInfinite";
-import { apiVersion } from "../../../functions/functions-general";
+import { queryDataInfinite } from "../../../../functions/custom-hooks/queryDataInfinite";
+import { apiVersion } from "../../../../functions/functions-general";
 import { useInView } from "react-intersection-observer";
-import NoData from "../../../partials/NoData";
-import ServerError from "../../../partials/ServerError";
-import TableLoading from "../../../partials/TableLoading";
-import FetchingSpinner from "../../../partials/spinners/FetchingSpinner";
-import Loadmore from "../../../partials/Loadmore";
-import Status from "../../../partials/Status";
+import NoData from "../../../../partials/NoData";
+import ServerError from "../../../../partials/ServerError";
+import TableLoading from "../../../../partials/TableLoading";
+import FetchingSpinner from "../../../../partials/spinners/FetchingSpinner";
+import Loadmore from "../../../../partials/Loadmore";
+import Status from "../../../../partials/Status";
 import { FaArchive, FaEdit, FaTrash, FaTrashRestore } from "react-icons/fa";
 import {
   setIsAdd,
   setIsArchive,
   setIsDelete,
   setIsRestore,
-} from "../../../store/StoreAction";
-import ModalArchive from "../../../partials/modals/ModalArchive";
-import ModalRestore from "../../../partials/modals/ModalRestore";
-import ModalDelete from "../../../partials/modals/ModalDelete";
-import SearchBar from "../../../partials/SearchBar";
-import { FaUserGroup } from "react-icons/fa6";
+} from "../../../../store/StoreAction";
+import ModalArchive from "../../../../partials/modals/ModalArchive";
+import ModalRestore from "../../../../partials/modals/ModalRestore";
+import ModalDelete from "../../../../partials/modals/ModalDelete";
+import SearchBar from "../../../../partials/SearchBar";
 
-const DonorsList = ({ itemEdit, setItemEdit }) => {
+const NotificationList = ({ itemEdit, setItemEdit }) => {
   const { store, dispatch } = React.useContext(StoreContext);
 
   const [page, setPage] = React.useState(1);
@@ -42,17 +41,17 @@ const DonorsList = ({ itemEdit, setItemEdit }) => {
     isFetchingNextPage,
     status,
   } = useInfiniteQuery({
-    queryKey: ["donors", search.current.value, store.isSearch, filterData],
+    queryKey: ["notification", search.current.value, store.isSearch, filterData],
     queryFn: async ({ pageParam = 1 }) =>
       await queryDataInfinite(
         ``,
-        `${apiVersion}/controllers/developers/donors/page.php?start=${pageParam}`,
+        `${apiVersion}/controllers/developers/settings/notification/page.php?start=${pageParam}`,
         false,
         {
           filterData,
           searchValue: search?.current?.value,
         },
-        `post`
+        `post`,
       ),
     getNextPageParam: (lastPage) => {
       if (lastPage.page < lastPage.total) {
@@ -74,14 +73,17 @@ const DonorsList = ({ itemEdit, setItemEdit }) => {
     dispatch(setIsAdd(true));
     setItemEdit(item);
   };
+
   const handleArchive = (item) => {
     dispatch(setIsArchive(true));
     setItemEdit(item);
   };
+
   const handleRestore = (item) => {
     dispatch(setIsRestore(true));
     setItemEdit(item);
   };
+
   const handleDelete = (item) => {
     dispatch(setIsDelete(true));
     setItemEdit(item);
@@ -90,22 +92,16 @@ const DonorsList = ({ itemEdit, setItemEdit }) => {
   return (
     <>
       <div className="pt-5 pb-2 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <label htmlFor="">Status</label>
-            <select
-              onChange={(e) => setFilterData(e.target.value)}
-              value={filterData || ""}
-            >
-              <option value="">All</option>
-              <option value="1">Active</option>
-              <option value="0">Inactive</option>
-            </select>
-          </div>
-          <div className="flex items-center gap-1 font-semibold">
-            <FaUserGroup />
-            <span>{result?.pages?.[0]?.total || 0}</span>
-          </div>
+        <div className="relative">
+          <label htmlFor="">Status</label>
+          <select
+            onChange={(e) => setFilterData(e.target.value)}
+            value={filterData || ""}
+          >
+            <option value="">All</option>
+            <option value="1">Active</option>
+            <option value="0">Inactive</option>
+          </select>
         </div>
         <SearchBar
           search={search}
@@ -127,8 +123,8 @@ const DonorsList = ({ itemEdit, setItemEdit }) => {
               <th>Status</th>
               <th>Name</th>
               <th>Email</th>
-              <th>Stripe ID</th>
-              <th></th>
+              <th>Phone</th>
+              <th>Purpose</th>
               <th></th>
             </tr>
           </thead>
@@ -162,25 +158,16 @@ const DonorsList = ({ itemEdit, setItemEdit }) => {
                       <td>{counter++}.</td>
                       <td>
                         <Status
-                          text={`${
-                            item.donor_is_active == 1 ? "active" : "inactive"
-                          }`}
+                          text={`${item.notification_is_active == 1 ? "active" : "inactive"}`}
                         />
                       </td>
-                      <td>{item.donor_name}</td>
-                      <td>{item.donor_email}</td>
-                      <td></td>
-                      <td>
-                        <button
-                          type="button"
-                          className="px-3 py-1 bg-primary text-white rounded-md"
-                        >
-                          Donate
-                        </button>
-                      </td>
+                      <td>{item.notification_name}</td>
+                      <td>{item.notification_email}</td>
+                      <td>{item.notification_phone}</td>
+                      <td>{item.notification_purpose}</td>
                       <td>
                         <div className="flex items-center gap-3">
-                          {item.donor_is_active == 1 ? (
+                          {item.notification_is_active == 1 ? (
                             <>
                               <button
                                 type="button"
@@ -228,6 +215,7 @@ const DonorsList = ({ itemEdit, setItemEdit }) => {
             ))}
           </tbody>
         </table>
+
         <div className="loadmore flex justify-center flex-col items-center pb-10">
           <Loadmore
             fetchNextPage={fetchNextPage}
@@ -244,35 +232,35 @@ const DonorsList = ({ itemEdit, setItemEdit }) => {
 
       {store.isArchive && (
         <ModalArchive
-          mysqlApiArchive={`${apiVersion}/controllers/developers/donors/active.php?id=${itemEdit.donor_aid}`}
+          mysqlApiArchive={`${apiVersion}/controllers/developers/settings/notification/active.php?id=${itemEdit.notification_aid}`}
           msg="Are you sure you want to archive this record?"
           successMsg="Successfully archived record!"
           dataItem={itemEdit}
-          queryKey={"donors"}
+          queryKey={"notification"}
         />
       )}
 
       {store.isRestore && (
         <ModalRestore
-          mysqlApiRestore={`${apiVersion}/controllers/developers/donors/active.php?id=${itemEdit.donor_aid}`}
+          mysqlApiRestore={`${apiVersion}/controllers/developers/settings/notification/active.php?id=${itemEdit.notification_aid}`}
           msg="Are you sure you want to restore this record?"
           successMsg="Successfully restore record!"
           dataItem={itemEdit}
-          queryKey={"donors"}
+          queryKey={"notification"}
         />
       )}
 
       {store.isDelete && (
         <ModalDelete
-          mysqlApiDelete={`${apiVersion}/controllers/developers/donors/delete.php?id=${itemEdit.donor_aid}`}
+          mysqlApiDelete={`${apiVersion}/controllers/developers/settings/notification/delete.php?id=${itemEdit.notification_aid}`}
           msg="Are you sure you want to delete this record?"
           successMsg="Successfully deleted!"
           dataItem={itemEdit}
-          queryKey={"donors"}
+          queryKey={"notification"}
         />
       )}
     </>
   );
 };
 
-export default DonorsList;
+export default NotificationList;

@@ -1,25 +1,32 @@
 import { MdDashboard } from "react-icons/md";
 import { devNavUrl, urlDeveloper } from "../../functions/functions-general";
-import { FaClipboardList, FaCogs, FaUsers } from "react-icons/fa";
+import {
+  FaClipboardList,
+  FaCogs,
+  FaHandHoldingHeart,
+  FaListUl,
+  FaUsers,
+} from "react-icons/fa";
+import { FaChildren, FaGear } from "react-icons/fa6";
 
 export const navList = [
   {
     label: "Donor List",
-    icon: <MdDashboard />,
+    icon: <FaHandHoldingHeart />,
     menu: "donorlist",
     path: `${devNavUrl}/${urlDeveloper}/donorlist`,
     submenu: "",
   },
   {
     label: "Children List",
-    icon: <FaUsers />,
+    icon: <FaChildren />,
     menu: "children-list",
     path: `${devNavUrl}/${urlDeveloper}/children-list`,
     submenu: "",
   },
   {
     label: "Reports",
-    icon: <FaClipboardList />,
+    icon: <FaListUl />,
     menu: "reports",
     submenu: "",
     subNavList: [
@@ -42,7 +49,7 @@ export const navList = [
   },
   {
     label: "Settings",
-    icon: <FaCogs />,
+    icon: <FaGear />,
     menu: "settings",
     submenu: "",
     subNavList: [

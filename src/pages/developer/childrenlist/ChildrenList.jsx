@@ -2,7 +2,7 @@ import React from "react";
 import { StoreContext } from "../../../store/StoreContext";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { queryDataInfinite } from "../../../functions/custom-hooks/queryDataInfinite";
-import { apiVersion } from "../../../functions/functions-general";
+import { apiVersion, formatDate } from "../../../functions/functions-general";
 import { useInView } from "react-intersection-observer";
 import NoData from "../../../partials/NoData";
 import ServerError from "../../../partials/ServerError";
@@ -11,6 +11,7 @@ import FetchingSpinner from "../../../partials/spinners/FetchingSpinner";
 import Loadmore from "../../../partials/Loadmore";
 import Status from "../../../partials/Status";
 import { FaArchive, FaEdit, FaTrash, FaTrashRestore } from "react-icons/fa";
+import { FaUserGroup } from "react-icons/fa6";
 import {
   setIsAdd,
   setIsArchive,
@@ -21,9 +22,8 @@ import ModalArchive from "../../../partials/modals/ModalArchive";
 import ModalRestore from "../../../partials/modals/ModalRestore";
 import ModalDelete from "../../../partials/modals/ModalDelete";
 import SearchBar from "../../../partials/SearchBar";
-import { FaUserGroup } from "react-icons/fa6";
 
-const DonorsList = ({ itemEdit, setItemEdit }) => {
+const ChildrenList = ({ itemEdit, setItemEdit }) => {
   const { store, dispatch } = React.useContext(StoreContext);
 
   const [page, setPage] = React.useState(1);
@@ -42,11 +42,11 @@ const DonorsList = ({ itemEdit, setItemEdit }) => {
     isFetchingNextPage,
     status,
   } = useInfiniteQuery({
-    queryKey: ["donors", search.current.value, store.isSearch, filterData],
+    queryKey: ["children", search.current.value, store.isSearch, filterData],
     queryFn: async ({ pageParam = 1 }) =>
       await queryDataInfinite(
         ``,
-        `${apiVersion}/controllers/developers/donors/page.php?start=${pageParam}`,
+        `${apiVersion}/controllers/developers/children/page.php?start=${pageParam}`,
         false,
         {
           filterData,
@@ -74,14 +74,17 @@ const DonorsList = ({ itemEdit, setItemEdit }) => {
     dispatch(setIsAdd(true));
     setItemEdit(item);
   };
+
   const handleArchive = (item) => {
     dispatch(setIsArchive(true));
     setItemEdit(item);
   };
+
   const handleRestore = (item) => {
     dispatch(setIsRestore(true));
     setItemEdit(item);
   };
+
   const handleDelete = (item) => {
     dispatch(setIsDelete(true));
     setItemEdit(item);
@@ -126,9 +129,10 @@ const DonorsList = ({ itemEdit, setItemEdit }) => {
               <th>#</th>
               <th>Status</th>
               <th>Name</th>
-              <th>Email</th>
-              <th>Stripe ID</th>
-              <th></th>
+              <th>Birth Date</th>
+              <th>Age</th>
+              <th>Residency Status</th>
+              <th>Donation Limit</th>
               <th></th>
             </tr>
           </thead>
@@ -163,24 +167,26 @@ const DonorsList = ({ itemEdit, setItemEdit }) => {
                       <td>
                         <Status
                           text={`${
-                            item.donor_is_active == 1 ? "active" : "inactive"
+                            item.children_is_active == 1 ? "active" : "inactive"
                           }`}
                         />
                       </td>
-                      <td>{item.donor_name}</td>
-                      <td>{item.donor_email}</td>
-                      <td></td>
+                      <td>{item.children_name}</td>
+                      <td>{formatDate(item.children_birth_date, "--")}</td>
+                      <td>{item.children_age}</td>
+                      <td>{item.children_residency || "--"}</td>
                       <td>
-                        <button
-                          type="button"
-                          className="px-3 py-1 bg-primary text-white rounded-md"
-                        >
-                          Donate
-                        </button>
+                        $
+                        {Number(
+                          item.children_donation_limit || 0
+                        ).toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
                       </td>
                       <td>
                         <div className="flex items-center gap-3">
-                          {item.donor_is_active == 1 ? (
+                          {item.children_is_active == 1 ? (
                             <>
                               <button
                                 type="button"
@@ -228,6 +234,7 @@ const DonorsList = ({ itemEdit, setItemEdit }) => {
             ))}
           </tbody>
         </table>
+
         <div className="loadmore flex justify-center flex-col items-center pb-10">
           <Loadmore
             fetchNextPage={fetchNextPage}
@@ -244,35 +251,35 @@ const DonorsList = ({ itemEdit, setItemEdit }) => {
 
       {store.isArchive && (
         <ModalArchive
-          mysqlApiArchive={`${apiVersion}/controllers/developers/donors/active.php?id=${itemEdit.donor_aid}`}
+          mysqlApiArchive={`${apiVersion}/controllers/developers/children/active.php?id=${itemEdit.children_aid}`}
           msg="Are you sure you want to archive this record?"
           successMsg="Successfully archived record!"
           dataItem={itemEdit}
-          queryKey={"donors"}
+          queryKey={"children"}
         />
       )}
 
       {store.isRestore && (
         <ModalRestore
-          mysqlApiRestore={`${apiVersion}/controllers/developers/donors/active.php?id=${itemEdit.donor_aid}`}
+          mysqlApiRestore={`${apiVersion}/controllers/developers/children/active.php?id=${itemEdit.children_aid}`}
           msg="Are you sure you want to restore this record?"
           successMsg="Successfully restore record!"
           dataItem={itemEdit}
-          queryKey={"donors"}
+          queryKey={"children"}
         />
       )}
 
       {store.isDelete && (
         <ModalDelete
-          mysqlApiDelete={`${apiVersion}/controllers/developers/donors/delete.php?id=${itemEdit.donor_aid}`}
+          mysqlApiDelete={`${apiVersion}/controllers/developers/children/delete.php?id=${itemEdit.children_aid}`}
           msg="Are you sure you want to delete this record?"
           successMsg="Successfully deleted!"
           dataItem={itemEdit}
-          queryKey={"donors"}
+          queryKey={"children"}
         />
       )}
     </>
   );
 };
 
-export default DonorsList;
+export default ChildrenList;

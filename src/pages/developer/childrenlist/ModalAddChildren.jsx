@@ -15,9 +15,13 @@ import { StoreContext } from "../../../store/StoreContext";
 import ModalWrapperSide from "../../../partials/modals/ModalWrapperSide";
 import MessageError from "../../../partials/MessageError";
 import ButtonSpinner from "../../../partials/spinners/ButtonSpinner";
-import { InputCheckbox, InputText } from "../../../components/form-input/FormInputs";
+import {
+  InputCheckbox,
+  InputText,
+  InputTextArea,
+} from "../../../components/form-input/FormInputs";
 
-const ModalAddDonors = ({ itemEdit }) => {
+const ModalAddChildren = ({ itemEdit }) => {
   const { store, dispatch } = React.useContext(StoreContext);
 
   const queryClient = useQueryClient();
@@ -25,13 +29,13 @@ const ModalAddDonors = ({ itemEdit }) => {
     mutationFn: (values) =>
       queryData(
         itemEdit
-          ? `${apiVersion}/controllers/developers/donors/donors.php?id=${itemEdit.donor_aid}`
-          : `${apiVersion}/controllers/developers/donors/donors.php`,
+          ? `${apiVersion}/controllers/developers/children/children.php?id=${itemEdit.children_aid}`
+          : `${apiVersion}/controllers/developers/children/children.php`,
         itemEdit ? "put" : "post",
         values,
       ),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["donors"] });
+      queryClient.invalidateQueries({ queryKey: ["children"] });
 
       if (data.success) {
         dispatch(setSuccess(true));
@@ -46,27 +50,19 @@ const ModalAddDonors = ({ itemEdit }) => {
   });
 
   const initVal = {
-    donor_is_active: itemEdit ? Number(itemEdit.donor_is_active) === 1 : true,
-    donor_name: itemEdit ? itemEdit.donor_name : "",
-    donor_email: itemEdit ? itemEdit.donor_email : "",
-    donor_contact: itemEdit ? itemEdit.donor_contact : "",
-    donor_address: itemEdit ? itemEdit.donor_address : "",
-    donor_city: itemEdit ? itemEdit.donor_city : "",
-    donor_state: itemEdit ? itemEdit.donor_state : "",
-    donor_country: itemEdit ? itemEdit.donor_country : "",
-    donor_zip: itemEdit ? itemEdit.donor_zip : "",
-    donor_name_old: itemEdit ? itemEdit.donor_name : "",
+    children_name: itemEdit ? itemEdit.children_name : "",
+    children_birth_date: itemEdit ? itemEdit.children_birth_date : "",
+    children_story: itemEdit ? itemEdit.children_story : "",
+    children_donation_limit: itemEdit ? itemEdit.children_donation_limit : "0.00",
+    is_resident: itemEdit ? itemEdit.children_residency === "Resident" : false,
+    children_name_old: itemEdit ? itemEdit.children_name : "",
   };
 
   const yupSchema = Yup.object({
-    donor_name: Yup.string().trim().required("required"),
-    donor_email: Yup.string().trim().email("invalid email").required("required"),
-    donor_contact: Yup.string().trim().required("required"),
-    donor_address: Yup.string().trim().required("required"),
-    donor_city: Yup.string().trim().required("required"),
-    donor_state: Yup.string().trim().required("required"),
-    donor_country: Yup.string().trim().required("required"),
-    donor_zip: Yup.string().trim().required("required"),
+    children_name: Yup.string().trim().required("required"),
+    children_birth_date: Yup.string().trim().required("required"),
+    children_story: Yup.string().trim().required("required"),
+    children_donation_limit: Yup.number().typeError("required").min(0).required("required"),
   });
 
   const handleClose = () => {
@@ -84,7 +80,9 @@ const ModalAddDonors = ({ itemEdit }) => {
         className="transition-all ease-in-out transform duration-200"
       >
         <div className="modal-header relative mb-4">
-          <h3 className="text-dark text-sm">{itemEdit ? "Update" : "Add"} Donor</h3>
+          <h3 className="text-dark text-sm">
+            {itemEdit ? "Update" : "Add"} Children
+          </h3>
           <button
             type="button"
             className="absolute top-0 right-4"
@@ -102,7 +100,7 @@ const ModalAddDonors = ({ itemEdit }) => {
               dispatch(setError(false));
               mutation.mutate({
                 ...values,
-                donor_is_active: values.donor_is_active ? 1 : 0,
+                children_residency: values.is_resident ? "Resident" : "Non-Resident",
               });
             }}
           >
@@ -111,18 +109,10 @@ const ModalAddDonors = ({ itemEdit }) => {
                 <Form className="h-full">
                   <div className="modal-form-container">
                     <div className="modal-container">
-                      <div className="mb-6">
-                        <InputCheckbox
-                          label="Active"
-                          name="donor_is_active"
-                          disabled={mutation.isPending}
-                        />
-                      </div>
-
                       <div className="relative mb-6">
                         <InputText
                           label="Full Name"
-                          name="donor_name"
+                          name="children_name"
                           type="text"
                           disabled={mutation.isPending}
                         />
@@ -130,63 +120,34 @@ const ModalAddDonors = ({ itemEdit }) => {
 
                       <div className="relative mb-6">
                         <InputText
-                          label="Email"
-                          name="donor_email"
-                          type="email"
+                          label="Birth Date"
+                          name="children_birth_date"
+                          type="date"
+                          disabled={mutation.isPending}
+                        />
+                      </div>
+
+                      <div className="relative mb-6">
+                        <InputTextArea
+                          label="My Story"
+                          name="children_story"
                           disabled={mutation.isPending}
                         />
                       </div>
 
                       <div className="relative mb-6">
                         <InputText
-                          label="Contact Number"
-                          name="donor_contact"
+                          label="Donation Amount Limit"
+                          name="children_donation_limit"
                           type="text"
                           disabled={mutation.isPending}
                         />
                       </div>
 
-                      <div className="relative mb-6">
-                        <InputText
-                          label="Address"
-                          name="donor_address"
-                          type="text"
-                          disabled={mutation.isPending}
-                        />
-                      </div>
-
-                      <div className="relative mb-6">
-                        <InputText
-                          label="City"
-                          name="donor_city"
-                          type="text"
-                          disabled={mutation.isPending}
-                        />
-                      </div>
-
-                      <div className="relative mb-6">
-                        <InputText
-                          label="State/Province"
-                          name="donor_state"
-                          type="text"
-                          disabled={mutation.isPending}
-                        />
-                      </div>
-
-                      <div className="relative mb-6">
-                        <InputText
-                          label="Country"
-                          name="donor_country"
-                          type="text"
-                          disabled={mutation.isPending}
-                        />
-                      </div>
-
-                      <div className="relative mb-6">
-                        <InputText
-                          label="Zip"
-                          name="donor_zip"
-                          type="text"
+                      <div className="mb-6">
+                        <InputCheckbox
+                          label="Mark Check If Resident"
+                          name="is_resident"
                           disabled={mutation.isPending}
                         />
                       </div>
@@ -227,4 +188,4 @@ const ModalAddDonors = ({ itemEdit }) => {
   );
 };
 
-export default ModalAddDonors;
+export default ModalAddChildren;
