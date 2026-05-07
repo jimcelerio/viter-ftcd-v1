@@ -6,6 +6,7 @@ import {
   Routes,
 } from "react-router-dom";
 import PageNotFound from "./partials/PageNotFound";
+import { routesAccess } from "./routes/routesAccess";
 import { routesDeveloper } from "./routes/routesDeveloper";
 import { StoreProvider } from "./store/StoreContext";
 
@@ -25,6 +26,10 @@ function App() {
 
               {routesDeveloper.map(({ ...routesProps }, key) => {
                 return <Route key={key} {...routesProps} />;
+              })}
+
+              {routesAccess.map(({ ...routesProps }, key) => {
+                return <Route key={`access-${key}`} {...routesProps} />;
               })}
             </Routes>
           </Router>

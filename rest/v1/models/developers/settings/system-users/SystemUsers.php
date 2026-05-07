@@ -7,6 +7,8 @@ class SystemUsers
     public $system_users_first_name;
     public $system_users_last_name;
     public $system_users_email;
+    public $system_users_password;
+    public $system_users_key;
     public $system_users_role_id;
     public $system_users_created;
     public $system_users_updated;
@@ -37,6 +39,8 @@ class SystemUsers
             $sql .= " system_users_first_name, ";
             $sql .= " system_users_last_name, ";
             $sql .= " system_users_email, ";
+            $sql .= " system_users_password, ";
+            $sql .= " system_users_key, ";
             $sql .= " system_users_role_id, ";
             $sql .= " system_users_created, ";
             $sql .= " system_users_updated ";
@@ -45,6 +49,8 @@ class SystemUsers
             $sql .= " :system_users_first_name, ";
             $sql .= " :system_users_last_name, ";
             $sql .= " :system_users_email, ";
+            $sql .= " :system_users_password, ";
+            $sql .= " :system_users_key, ";
             $sql .= " :system_users_role_id, ";
             $sql .= " :system_users_created, ";
             $sql .= " :system_users_updated ";
@@ -55,6 +61,8 @@ class SystemUsers
                 "system_users_first_name" => $this->system_users_first_name,
                 "system_users_last_name" => $this->system_users_last_name,
                 "system_users_email" => $this->system_users_email,
+                "system_users_password" => $this->system_users_password,
+                "system_users_key" => $this->system_users_key,
                 "system_users_role_id" => $this->system_users_role_id,
                 "system_users_created" => $this->system_users_created,
                 "system_users_updated" => $this->system_users_updated,
@@ -215,6 +223,45 @@ class SystemUsers
             returnError($e);
             $query = false;
         }
+        return $query;
+    }
+
+    public function setPassword()
+    {
+        try {
+            $sql = "update {$this->tblSystemUsers} set ";
+            $sql .= "system_users_key = '', ";
+            $sql .= "system_users_password = :system_users_password, ";
+            $sql .= "system_users_updated = :system_users_updated ";
+            $sql .= "where system_users_key = :system_users_key ";
+            $query = $this->connection->prepare($sql);
+            $query->execute([
+                "system_users_password" => $this->system_users_password,
+                "system_users_updated" => $this->system_users_updated,
+                "system_users_key" => $this->system_users_key,
+            ]);
+        } catch (PDOException $e) {
+            returnError($e);
+            $query = false;
+        }
+
+        return $query;
+    }
+
+    public function readKey()
+    {
+        try {
+            $sql = "select * from {$this->tblSystemUsers} ";
+            $sql .= "where system_users_key = :system_users_key ";
+            $query = $this->connection->prepare($sql);
+            $query->execute([
+                "system_users_key" => $this->system_users_key,
+            ]);
+        } catch (PDOException $e) {
+            returnError($e);
+            $query = false;
+        }
+
         return $query;
     }
 }
